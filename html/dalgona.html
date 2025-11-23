@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DALGONA</title>
+    <link rel="shortcut icon" href="../images/dal.png" type="image/x-icon">
+</head>
+
+<style>
+
+* {
+   box-sizing: border-box;
+}
+
+body {
+   margin: 0;
+   /* font-family: 'Crimson Text', serif; */
+   font-family: 'Sunflower', sans-serif;
+   --color-black: #080A0C;
+   --color-beige: #d8c99b;
+   --color-green: #68a691;
+   --color-green-light: #a5cabe;
+   --color-pink: #ca6680;
+   --color-pink-light: #db95a7;
+   background-color: var(--color-black);
+   /* Background from SVGBackgrounds.com */
+   background-attachment: fixed;
+   background-size: cover;
+}
+
+h1,
+h2 {
+   margin: 0;
+   margin-bottom: 1rem;
+}
+
+h1 {
+   font-family: 'Zen Dots', cursive;
+   font-size: 2rem;
+}
+
+h2 {
+   font-size: 1.4rem;
+   font-weight: 500;
+   background-color: var(--color-beige);
+   text-align: center;
+   margin: 1rem 0 0 0;
+}
+
+a {
+   color: var(--color-pink);
+}
+
+a:hover,
+a:focus {
+   color: var(--color-green-light);
+}
+
+button {
+   border: 0;
+   box-shadow: none;
+   font-family: 'Sunflower', sans-serif;
+   font-weight: 500;
+}
+
+button:hover,
+button:focus {
+   cursor: pointer;
+}
+
+.container {
+   width: 98%;
+   max-width: 500px;
+   margin: 0 auto;
+}
+
+.container-canvas {
+   width: 370px;
+   height: 370px;
+   margin: 3em auto 0;
+   position: relative;
+}
+
+canvas {
+   display: block;
+   border-radius: 50%;
+   border: 2px solid var(--color-green);
+   box-shadow: 0 0 4px 4px #060c15; 
+   width: 370px;
+   height: 370px;
+   background-color: #c1b36c;
+   /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#c4b56f+0,c1a94f+62,6b4c14+90,c1a94f+93,956b1b+94,956b1b+100 */
+   background: #c4b56f; /* Old browsers */
+   background: -moz-radial-gradient(center, ellipse cover,  #c4b56f 0%, #c1a94f 62%, #6b4c14 90%, #c1a94f 93%, #956b1b 94%, #956b1b 100%); /* FF3.6-15 */
+   background: -webkit-radial-gradient(center, ellipse cover,  #c4b56f 0%,#c1a94f 62%,#6b4c14 90%,#c1a94f 93%,#956b1b 94%,#956b1b 100%); /* Chrome10-25,Safari5.1-6 */
+   background: radial-gradient(ellipse at center,  #c4b56f 0%,#c1a94f 62%,#6b4c14 90%,#c1a94f 93%,#956b1b 94%,#956b1b 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c4b56f', endColorstr='#956b1b',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
+
+.game {
+   display: grid;
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100vw;
+   height: 100vh;
+   place-content: center;
+   background-color: rgba(8, 10, 12, 0.998);
+   transition: opacity 0.4s ease-in-out;
+}
+
+.game.hidden {
+   opacity: 0;
+   pointer-events: none;
+}
+
+.game__card {
+   background-color: var(--color-beige);
+   color: var(--color-black);
+   padding: 1.4rem 2rem;
+   text-align: center;
+}
+
+.game__buttons {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: 1rem;
+}
+
+.game__button {
+   background-color: transparent;
+}
+
+.game__button svg {
+   width: 48px;
+}
+
+.game__button:hover svg,
+.game__button:focus svg {
+   fill: var(--color-pink);
+}
+
+.results {
+   background-color: var(--color-black);
+   color: var(--color-green-light);
+   padding: 0.8rem;
+   font-family: 'Zen Dots', cursive;
+   font-size: 1.2rem;
+   letter-spacing: 1px;
+   text-align: center;
+   text-transform: uppercase;
+   margin-top: 1.2rem;
+}
+
+.score {
+   background-color: var(--color-green-light);
+   font-size: 1.4rem;
+   text-align: center;
+   padding: 1rem;
+}
+
+.restart {
+   display: block;
+   margin: 0 auto;
+   color: var(--color-black);
+   background-color: var(--color-pink-light);
+   font-size: 1.5rem;
+   letter-spacing: 0.8px;
+   text-transform: uppercase;
+   padding: 0.4rem 1rem 0.2rem;
+   margin-top: 1rem;
+}
+
+.restart:hover,
+.restart:focus {
+   background-color: var(--color-green-light);
+}
+
+footer {
+   margin-top: 3rem;
+   text-align: center;
+   background-color: var(--color-black);
+   color: var(--color-beige);
+   padding: 0.5rem;
+}
+
+</style>
+
+<body>
+
+    <div class="container container-canvas">
+      <canvas></canvas>
+   </div>
+   <div class="container">
+      <div class="results">Results:</div>
+      <div class="score"></div>
+      <button class="restart">Start Over</button>
+   </div>
+   <section class="game">
+      <div class="game__card">
+         <h1>Select Your Shape</h1>
+         <div class="game__buttons">
+            <button class="game__button game__button-triangle" aria-label="Triangle">
+               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                  <!-- Font Awesome Pro 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) -->
+                  <path
+                     d="M329.6 24c-18.4-32-64.7-32-83.2 0L6.5 440c-18.4 31.9 4.6 72 41.6 72H528c36.9 0 60-40 41.6-72l-240-416zM48 464L288 48l240 416H48z" />
+               </svg>
+            </button>
+            <button class="game__button game__button-circle" aria-label="Circle">
+               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                  <!-- Font Awesome Pro 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) -->
+                  <path
+                     d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z" />
+               </svg>
+            </button>
+            <button class="game__button game__button-star" aria-label="Star">
+               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                  <!-- Font Awesome Pro 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) -->
+                  <path
+                     d="M528.1 171.5L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6zM388.6 312.3l23.7 138.4L288 385.4l-124.3 65.3 23.7-138.4-100.6-98 139-20.2 62.2-126 62.2 126 139 20.2-100.6 98z" />
+               </svg>
+            </button>
+            <button class="game__button game__button-umbrella" aria-label="Umbrella">
+               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                  <!-- Font Awesome Pro 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) -->
+                  <path
+                     d="M575.2 253.8C546.3 132.5 434.3 57.7 312 48.9V24c0-13.3-10.7-24-24-24s-24 10.7-24 24v24.9C142.1 57.6 30.5 131.8.8 253.7c-5.9 23.6 22.3 43.8 43.6 25.5l.5-.4c49.2-45.8 89.5-28.1 125.3 27.7 11.3 17.8 34.8 16.9 45.6 0 13.5-20.9 27.6-40.2 48.2-48.8V440c0 13.2-10.8 24-24 24-10.2 0-19.3-6.4-22.7-16-4.4-12.5-18.1-19-30.6-14.6s-19 18.1-14.6 30.6c10.2 28.7 37.4 48 67.9 48 39.7 0 72-32.3 72-72V258c25.9 10.8 38 32.6 48.2 48.5 10.8 16.9 34.2 17.8 45.6 0 36.2-56 76.6-73.1 125.4-27.7l.5.4c21.1 18.2 49.3-1.7 43.5-25.4zm-191.4 1.5c-24-30-56.8-50.3-95.8-50.3-39.4 0-69.7 18.7-94.6 49.9-35.7-44.3-82.8-57.1-122.7-46.8C115 134.8 202 96 288 96c85.6 0 173.8 39 217.8 112.8-47.9-13.8-89.8 8.1-122 46.5z" />
+               </svg>
+            </button>
+         </div>
+         <h2>Hold Down and Trace<br>Score 75+% to Pass</h2>
+   <a href="../html/index.html" style="text-decoration: none;padding-top: 20px; float: left; text-align: center; width: 100%;">BACK</a>
+
+      </div>
+
+   </section>
+
+   
+
+   <script>
+    /* Prepare canvas */
+const viewportWidth = window.innerWidth;
+const container = document.querySelector('.container');
+const bounds = container.getBoundingClientRect();
+const canvas = document.querySelector('canvas');
+const ctx = canvas.getContext('2d');
+
+const buttonTriangle = document.querySelector('.game__button-triangle');
+const buttonCircle = document.querySelector('.game__button-circle');
+const buttonStar = document.querySelector('.game__button-star');
+const buttonUmbrella = document.querySelector('.game__button-umbrella');
+const gameStart = document.querySelector('.game');
+const score = document.querySelector('.score');
+const restart = document.querySelector('.restart');
+
+let mouseDown = false;
+let startedTurn = false;
+let brokeShape = false;
+let prevX = null;
+let prevY = null;
+let pixelsShape = 0;
+
+/* Set up the size and line styles of the canvas */
+function setupCanvas() {
+   canvas.height = 370;
+   canvas.width = 370;
+   canvas.style.width = `${canvas.width}px`;
+   canvas.style.height = `${canvas.height}px`;
+   ctx.lineWidth = 15;
+   ctx.lineCap = 'round';
+}
+
+/* Triangle shape */
+function drawTriangle() {
+   gameStart.classList.add('hidden');
+   ctx.strokeStyle = 'rgb(66, 10, 0)';
+   ctx.beginPath();
+   ctx.moveTo(185, 85);
+   ctx.lineTo(285, 260);
+   ctx.lineTo(85, 260);
+   ctx.closePath();
+   ctx.stroke();
+
+   /* Get pixels of shape */
+   pixelsShape = getPixelAmount(66, 10, 0);
+}
+
+/* Circle shape */
+function drawCircle() {
+   gameStart.classList.add('hidden');
+   ctx.strokeStyle = 'rgb(66, 10, 0)';
+   ctx.beginPath();
+   ctx.arc(185, 185, 100, 0 * Math.PI, 2 * Math.PI);
+   ctx.closePath();
+   ctx.stroke();
+
+   /* Get pixels of shape */
+   pixelsShape = getPixelAmount(66, 10, 0);
+}
+
+/* Star shape */
+function drawStar() {
+   gameStart.classList.add('hidden');
+   ctx.strokeStyle = 'rgb(66, 10, 0)';
+
+   let rot = Math.PI / 2 * 3;
+   let x = 185;
+   let y = 185;
+   let cx = 185;
+   let cy = 185;
+   const spikes = 5;
+   const outerRadius = 120;
+   const innerRadius = 60;
+   const step = Math.PI / 5;
+
+   ctx.strokeSyle = "#000";
+   ctx.beginPath();
+   ctx.moveTo(cx, cy - outerRadius)
+   for (i = 0; i < spikes; i++) {
+       x = cx + Math.cos(rot) * outerRadius;
+       y = cy + Math.sin(rot) * outerRadius;
+       ctx.lineTo(x, y)
+       rot += step
+
+       x = cx + Math.cos(rot) * innerRadius;
+       y = cy + Math.sin(rot) * innerRadius;
+       ctx.lineTo(x, y)
+       rot += step
+   }
+   ctx.lineTo(cx, cy - outerRadius)
+   ctx.closePath();
+   ctx.stroke();
+
+   /* Get pixels of shape */
+   pixelsShape = getPixelAmount(66, 10, 0);
+}
+
+/* Umbrella Shape */
+function drawUmbrella() {
+   gameStart.classList.add('hidden');
+   ctx.strokeStyle = 'rgb(66, 10, 0)';
+
+   /* Draw individual arcs */
+   drawArc(185, 165, 120, 0, 1); // large parasol
+   drawArc(93, 165, 26, 0, 1);
+   drawArc(146, 165, 26, 0, 1);
+   drawArc(228, 165, 26, 0, 1);
+   drawArc(279, 165, 26, 0, 1);
+
+   /* Draw handle */
+   ctx.moveTo(172, 165);
+   ctx.lineTo(172, 285);
+   ctx.stroke();
+   drawArc(222, 285, 50, 0, 1, false);
+   drawArc(256, 285, 16, 0, 1);
+   drawArc(221, 286, 19, 0, 1, false);
+   ctx.moveTo(202, 285);
+   ctx.lineTo(202, 169);
+   ctx.stroke();
+
+   /* Get pixels of shape */
+   pixelsShape = getPixelAmount(66, 10, 0);
+}
+
+/* Draw individual arcs */
+function drawArc(x, y, radius, start, end, counterClockwise = true) {
+   ctx.beginPath();
+   ctx.arc(x, y, radius, start * Math.PI, end * Math.PI, counterClockwise);
+   ctx.stroke();
+}
+
+/* Determine X and Y coordinates of mouse */
+function handleMouseMove(e) {
+   const x = e.clientX - bounds.left;
+   const y = e.clientY - bounds.top;
+   /* Only paint when user is holding mouse down */
+   if (mouseDown) {
+      paint(x, y);
+   }
+}
+
+/* Set variables once user has started the game */
+function handleMouseDown() {
+   if (!startedTurn) {
+      mouseDown = true;
+      startedTurn = true;
+   } else {
+      console.log('You already played');
+   }
+}
+
+function handleMouseUp() {
+   mouseDown = false;
+   /* Check score once user stops drawing */
+   evaluatePixels();
+}
+
+/* Get opacity of canvas */
+function getPixelColor(x, y) {
+   const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+   let index = ((y * (pixels.width * 4)) + (x * 4));
+   return {
+      r:pixels.data[index],
+      g:pixels.data[index + 1],
+      b:pixels.data[index + 2],
+      a:pixels.data[index + 3]
+   };
+}
+
+/* Begins path and moves context and paints line */
+function paint(x, y) {
+   let color = getPixelColor(x, y);
+   /* user has gone too far off the shape */
+   // console.log(`x: ${x}, y: ${y}, r: ${color.r}, g: ${color.g}, b: ${color.b}, a: ${color.a}`);
+   if (color.r === 0 && color.g === 0 && color.b === 0) {
+      score.textContent = `FAILURE - You broke the shape`;
+      brokeShape = true;
+   } else {
+      ctx.strokeStyle = 'rgb(247, 226, 135)';
+      ctx.beginPath();
+      /* Draw a continuous line */
+      if (prevX > 0 && prevY > 0) {
+         ctx.moveTo(prevX, prevY);
+      }
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      ctx.closePath();
+      prevX = x;
+      prevY = y;
+   }
+}
+
+/* Read the context and get all the pixels in the canvas based on their rgb values */
+function getPixelAmount(r, g, b) {
+   const pixelsData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+   const allPixels = pixelsData.data.length;;
+   let amount = 0;
+   for (let i = 0; i < allPixels; i += 4) {
+      if (pixelsData.data[i] === r &&
+         pixelsData.data[i+1] === g &&
+         pixelsData.data[i+2] === b) {
+        amount++;
+      }
+    }
+    return amount;
+}
+
+/* Divide the number of pixels that were traced by the pixels in the shape to determine how accurate the cut out is */
+function evaluatePixels() {
+   if (!brokeShape) {
+      const pixelsTrace = getPixelAmount(247, 226, 135);
+      //console.log(`Pixels Shape: ${pixelsShape}`);
+      //console.log(`Pixels Trace: ${pixelsTrace}`);
+      let pixelDifference = pixelsTrace / pixelsShape;
+      /* User has scored at last 50% but not drawn too much (especially on mobile) */
+      if (pixelDifference >= 0.75 && pixelDifference <= 1) {
+         score.textContent = `SUCCESS - You scored ${Math.round(pixelDifference * 100)}%`;
+      } else {
+         score.textContent = `FAILURE - You cut ${Math.round(pixelDifference * 100)}%`;
+      }
+   }
+}
+
+/* Clear all elements from the canvas */
+function clearCanvas() {
+   ctx.clearRect(0, 0, canvas.width, canvas.height);
+   gameStart.classList.remove('hidden');
+   mouseDown = false;
+   startedTurn = false;
+   brokeShape = false;
+   score.textContent = '';
+   prevX = null;
+   prevY = null;
+   pixelsShape = 0;
+}
+
+/* Event Handlers for drawing on the canvas */
+canvas.addEventListener('mousemove', handleMouseMove);
+canvas.addEventListener('mousedown', handleMouseDown);
+canvas.addEventListener('mouseup', handleMouseUp);
+
+/* Event handlers for shape buttons */
+buttonTriangle.addEventListener('click', drawTriangle);
+buttonCircle.addEventListener('click', drawCircle);
+buttonStar.addEventListener('click', drawStar);
+buttonUmbrella.addEventListener('click', drawUmbrella);
+
+/* Event handler for resetting the game */
+restart.addEventListener('click', clearCanvas);
+
+// Set up touch events for mobile, etc
+canvas.addEventListener('touchstart', function(e) {
+   mousePos = getTouchPos(canvas, e);
+   const touch = e.touches[0];
+   const mouseEvent = new MouseEvent('mousedown', {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+   });
+   canvas.dispatchEvent(mouseEvent);
+}, false);
+
+canvas.addEventListener('touchend', function() {
+   const mouseEvent = new MouseEvent('mouseup', {});
+   canvas.dispatchEvent(mouseEvent);
+}, false);
+
+canvas.addEventListener("touchmove", function(e) {
+   const touch = e.touches[0];
+   const mouseEvent = new MouseEvent('mousemove', {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+   });
+   canvas.dispatchEvent(mouseEvent);
+}, false);
+
+// Get the position of a touch relative to the canvas
+function getTouchPos(canvasDom, touchEvent) {
+   const rect = canvasDom.getBoundingClientRect();
+   return {
+      x: touchEvent.touches[0].clientX - rect.left,
+      y: touchEvent.touches[0].clientY - rect.top
+   };
+}
+
+// Prevent scrolling when touching the canvas
+document.body.addEventListener('touchstart', function(e) {
+   if (e.target == canvas) {
+     e.preventDefault();
+   }
+ }, false);
+ document.body.addEventListener('touchend', function(e) {
+   if (e.target == canvas) {
+     e.preventDefault();
+   }
+ }, false);
+ document.body.addEventListener('touchmove', function(e) {
+   if (e.target == canvas) {
+     e.preventDefault();
+   }
+ }, false);
+
+setupCanvas();
+   </script>
+    
+</body>
+</html>

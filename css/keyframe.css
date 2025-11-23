@@ -1,0 +1,44 @@
+@keyframes rotate {
+    0%{
+        transform: rotate(0deg);
+    }
+
+    50%{
+        transform: rotate(10deg);
+    }
+
+    100%{
+        transform: rotate(-10deg);
+    }
+}
+
+/******* DOLL BG (BLINK) ********/
+@keyframes zoom {
+
+    0%{
+        width: 300px;
+        height: 300px;
+        opacity: 1;
+        transform: rotate(0deg);
+
+    }
+
+
+    100%{
+        width: 300px;
+        height: 300px;
+        opacity: 2;
+        transform: rotate(360deg);
+    }
+
+}
+
+
+@keyframes opacity {
+    from{
+        margin-top: -200px;
+    }
+    to{
+        margin-top: 0;
+    }
+}

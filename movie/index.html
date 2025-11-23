@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Season1</title>
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --accent:#4f46e5; --muted:#94a3b8; --glass: rgba(255,255,255,0.03);
+    }
+    *{box-sizing:border-box}
+    
+    body{margin:0;background: linear-gradient(-230deg, #931766, #0E50A8);font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial; height: 100vh; color:#e6eef8; padding:28px;}
+
+    .wrapper{max-width:980px;margin:0 auto;display:grid;grid-template-columns:1fr 340px;gap:20px}
+    @media (max-width:880px){.wrapper{grid-template-columns:1fr;}}
+
+    .player-card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 6px 30px rgba(2,6,23,0.6);}
+    .video-area{position:relative;border-radius:8px;overflow:hidden;background:#000}
+    video{width:100%;height:auto;display:block;background:#000}
+
+    /* controls */
+    .controls{display:flex;align-items:center;gap:10px;padding:10px 6px}
+    .btn{background:var(--glass);border:1px solid rgba(255,255,255,0.03);padding:8px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+    .btn:hover{transform:translateY(-1px)}
+    .btn svg{width:18px;height:18px;fill:currentColor}
+
+    .progress-wrap{flex:1;padding:0 10px}
+    .progress{height:8px;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden;cursor:pointer}
+    .progress > .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#22c1c3)}
+    .time{font-size:13px;color:var(--muted);min-width:70px;text-align:right}
+
+    .right-controls{display:flex;gap:8px;align-items:center}
+
+    /* playlist */
+    .playlist{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border-radius:12px;padding:10px;}
+    .list-title{font-weight:600;margin-bottom:8px}
+    .item{display:flex;gap:10px;align-items:center;padding:8px;border-radius:8px;cursor:pointer}
+    .item:hover{background:rgba(255,255,255,0.02)}
+    .item.active{outline:2px solid rgba(79,70,229,0.18);background:linear-gradient(90deg, rgba(79,70,229,0.06), transparent)}
+    .thumb{width:88px;height:52px;border-radius:6px;flex:0 0 auto;object-fit:cover;background:#081018}
+    .meta{flex:1}
+    .meta .title{font-size:14px;font-weight:600}
+    .meta .desc{font-size:12px;color:var(--muted)}
+
+    /* helpers */
+    .controls .select{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:6px;border-radius:6px;color:var(--muted)}
+    .sr-only{position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden}
+
+    footer{margin-top:14px;color:var(--muted);font-size:13px;text-align:center}
+  </style>
+</head>
+<body>
+
+  <div class="game">
+    <a href="../html/index.html" style="color: white; text-decoration: none; font-weight: 600;"><--BACK</a>
+     <h1 style="text-align: center;">SQUID GAME MOVIE </h1>
+  </div>
+
+  <div class="wrapper">
+   
+    <div class="player-card">
+      <div class="video-area">
+        <video id="video" preload="metadata" tabindex="0">
+          <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+          Your browser does not support HTML5 video.
+        </video>
+      </div>
+
+      <div class="controls" role="toolbar" aria-label="Video controls">
+        <button id="playBtn" class="btn" title="Play/Pause" aria-pressed="false">
+          <!-- play icon -->
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+        </button>
+
+        <button id="prevBtn" class="btn" title="Previous">
+          <svg viewBox="0 0 24 24"><path d="M6 18V6h2v12H6zm3-6l8 6V6l-8 6z"></path></svg>
+        </button>
+        <button id="nextBtn" class="btn" title="Next">
+          <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zM11 6v12l8-6z"></path></svg>
+        </button>
+
+        <div class="progress-wrap" aria-hidden="false">
+          <div id="progress" class="progress" aria-label="Video progress bar" role="progressbar" tabindex="0">
+            <div class="bar"></div>
+          </div>
+        </div>
+
+        <div class="time" id="time">0:00 / 0:00</div>
+
+        <div class="right-controls">
+          <select id="speed" class="select" title="Playback speed">
+            <option value="0.5">0.5x</option>
+            <option value="0.75">0.75x</option>
+            <option value="1" selected>1x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2x</option>
+          </select>
+
+          <input id="volume" type="range" min="0" max="1" step="0.01" value="1" title="Volume" aria-label="Volume slider" style="width:90px">
+
+          <button id="fsBtn" class="btn" title="Fullscreen">
+            <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm0-4h2V7h3V5H7v5zm10 9h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <footer><a href="">DOWNLOAD</a></footer>
+    </div>
+
+    <aside class="playlist">
+      <div class="list-title">Playlist</div>
+      <div id="list">
+        <!-- items populated by JS -->
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    // Sample playlist - replace with your own URLs and thumbnails
+    const playlist = [
+      {
+        src: 'assets/videos/season1.mp4',
+        title: 'Squid Game ',
+        desc: '(Season-1) (Ep-1)',
+        thumb: 'assets/images/season1.jpg'
+      },
+      {
+        src: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/bee.mp4',
+        title: 'Squid Game',
+        desc: '(Season-1) (Ep-2)',
+        thumb: 'assets/images/ep2.avif'
+      },
+      {
+        src: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/river.mp4',
+        title: 'Squid Game',
+        desc: '(Season-1) (Ep-3)',
+        thumb: 'assets/images/ep3.webp'
+      }
+    ];
+
+    // Elements
+    const video = document.getElementById('video');
+    const playBtn = document.getElementById('playBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const progress = document.getElementById('progress');
+    const bar = progress.querySelector('.bar');
+    const timeLabel = document.getElementById('time');
+    const speed = document.getElementById('speed');
+    const volume = document.getElementById('volume');
+    const fsBtn = document.getElementById('fsBtn');
+    const listEl = document.getElementById('list');
+
+    let current = 0;
+    let isPlaying = false;
+
+    // Build playlist UI
+    function buildList(){
+      listEl.innerHTML = '';
+      playlist.forEach((item, i) => {
+        const el = document.createElement('div');
+        el.className = 'item';
+        el.setAttribute('role','button');
+        el.setAttribute('tabindex','0');
+        el.innerHTML = `
+          <img class="thumb" src="${item.thumb}" alt="${item.title} thumbnail">
+          <div class="meta"><div class="title">${item.title}</div><div class="desc">${item.desc}</div></div>
+        `;
+        el.addEventListener('click', () => loadIndex(i));
+        el.addEventListener('keydown', (e)=>{ if(e.key==='Enter') loadIndex(i); });
+        listEl.appendChild(el);
+      });
+      highlightCurrent();
+    }
+
+    function highlightCurrent(){
+      Array.from(listEl.children).forEach((el, i) => {
+        el.classList.toggle('active', i === current);
+      });
+    }
+
+    function loadIndex(i){
+      if(i<0) i = playlist.length -1;
+      if(i>=playlist.length) i = 0;
+      current = i;
+      video.src = playlist[current].src;
+      video.playbackRate = parseFloat(speed.value);
+      video.volume = parseFloat(volume.value);
+      video.play().catch(()=>{});
+      isPlaying = true;
+      updatePlayButton();
+      highlightCurrent();
+    }
+
+    // Play/pause toggle
+    function togglePlay(){
+      if(video.paused){ video.play(); isPlaying = true; }
+      else { video.pause(); isPlaying = false; }
+      updatePlayButton();
+    }
+
+    function updatePlayButton(){
+      playBtn.setAttribute('aria-pressed', isPlaying);
+      playBtn.innerHTML = isPlaying ? '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>' : '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>'
+    }
+
+    // Next / Prev
+    function next(){ loadIndex(current+1); }
+    function prev(){ loadIndex(current-1); }
+
+    // Progress update
+    video.addEventListener('timeupdate', ()=>{
+      const pct = (video.currentTime / video.duration) * 100 || 0;
+      bar.style.width = pct + '%';
+      timeLabel.textContent = formatTime(video.currentTime) + ' / ' + formatTime(video.duration || 0);
+    });
+
+    function formatTime(sec){
+      if(!sec || isNaN(sec)) return '0:00';
+      const s = Math.floor(sec % 60).toString().padStart(2,'0');
+      const m = Math.floor(sec/60);
+      return m + ':' + s;
+    }
+
+    // Seek by clicking progress
+    progress.addEventListener('click', (e)=>{
+      const rect = progress.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const pct = x / rect.width;
+      video.currentTime = pct * video.duration;
+    });
+
+    // Keyboard support for progress (left/right)
+    progress.addEventListener('keydown', (e)=>{
+      if(e.key === 'ArrowLeft') video.currentTime = Math.max(0, video.currentTime - 5);
+      if(e.key === 'ArrowRight') video.currentTime = Math.min(video.duration, video.currentTime + 5);
+    });
+
+    // Speed & Volume
+    speed.addEventListener('change', ()=>{ video.playbackRate = parseFloat(speed.value); });
+    volume.addEventListener('input', ()=>{ video.volume = parseFloat(volume.value); });
+
+    // Ended -> next
+    video.addEventListener('ended', ()=>{ next(); });
+
+    // Play/pause button
+    playBtn.addEventListener('click', togglePlay);
+    prevBtn.addEventListener('click', prev);
+    nextBtn.addEventListener('click', next);
+
+    // Fullscreen
+    fsBtn.addEventListener('click', ()=>{
+      if (!document.fullscreenElement) {
+        video.requestFullscreen?.();
+      } else { document.exitFullscreen?.(); }
+    });
+
+    // Video click toggles play
+    video.addEventListener('click', togglePlay);
+
+    // Keyboard shortcuts
+    window.addEventListener('keydown', (e)=>{
+      const activeTag = document.activeElement.tagName.toLowerCase();
+      if(activeTag === 'input' || activeTag === 'select' || activeTag === 'textarea') return;
+      switch(e.key){
+        case ' ':
+          e.preventDefault(); togglePlay(); break;
+        case 'ArrowRight': video.currentTime = Math.min(video.duration, video.currentTime + 5); break;
+        case 'ArrowLeft': video.currentTime = Math.max(0, video.currentTime - 5); break;
+        case 'ArrowUp': video.volume = Math.min(1, video.volume + 0.05); volume.value = video.volume; break;
+        case 'ArrowDown': video.volume = Math.max(0, video.volume - 0.05); volume.value = video.volume; break;
+        case 'f': case 'F': if (!document.fullscreenElement) video.requestFullscreen?.(); else document.exitFullscreen?.(); break;
+        case 'n': next(); break;
+        case 'p': prev(); break;
+      }
+    });
+
+    // Init
+    buildList();
+    loadIndex(0);
+
+    // Utility for adding a new item programmatically (example)
+    function addToPlaylist(item){ playlist.push(item); buildList(); }
+    // Example: addToPlaylist({src:'...',title:'New Video',desc:'',thumb:'...'});
+  </script>
+</body>
+</html>
